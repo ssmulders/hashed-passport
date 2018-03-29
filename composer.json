@@ -1,0 +1,32 @@
+{
+    "name": "ssmulders/hashed-passport",
+    "description": "Transforms Laravel Passport's default incrementing integer client_id into an industry standard unique hashed string. Non-intrusive as no migrations are needed and has still supports the 'old' integer client_id.",
+    "type": "library",
+    "require": {
+        "laravel/passport": "^5.0",
+        "vinkla/hashids": "^5.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Stan Smulders",
+            "email": "stansmulders@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        },
+        "laravel": {
+            "providers": [
+                "Ssmulders\\HashedPassport\\HashedPassportServiceProvider"
+            ]
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Ssmulders\\HashedPassport\\": "src/"
+        }
+    }
+}
