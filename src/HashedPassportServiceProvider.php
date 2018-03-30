@@ -4,6 +4,10 @@ namespace Ssmulders\HashedPassport;
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Passport\Passport;
+use Ssmulders\HashedPassport\Commands\Install;
+use Ssmulders\HashedPassport\Commands\Uninstall;
+use Ssmulders\HashedPassport\Observers\ClientObserver;
 
 class HashedPassportServiceProvider extends ServiceProvider
 {
@@ -29,21 +33,36 @@ class HashedPassportServiceProvider extends ServiceProvider
          * Catches both incoming and outgoing requests and should be compatible with custom routes
          */
         $router->middlewareGroup('hashed_passport', [
-            \Ssmulders\HashedPassport\Middleware\UnHashClientIdOnRequest::class,
-            \Ssmulders\HashedPassport\Middleware\HashClientIdOnResponse::class
+            \Ssmulders\HashedPassport\Middleware\DecodeHashedClientIdOnRequest::class,
         ]);
 
-//        $router->aliasMiddleware('hashpass_req', \Ssmulders\HashedPassport\Middleware\UnHashClientIdOnRequest::class);
-//        $router->aliasMiddleware('hashpass_resp', \Ssmulders\HashedPassport\Middleware\HashClientIdOnResponse::class);
+        /**
+         * Adds the encryption commands.
+         */
+        if ($this->app->runningInConsole())
+        {
+            /**
+             * Upgrades the secret column's max length from 100 to 2048 characters to support encrypted values.
+             */
+            if (HashedPassport::$withEncryption)
+            {
+                $this->loadMigrationsFrom(__DIR__ . '/migrations');
+            }
+
+            $this->commands([
+                Install::class,
+                Uninstall::class,
+            ]);
+        }
 
         /**
          * Overwrites the Passport routes after the app has loaded to ensure these are used.
          */
         $this->app->booted(function () {
-            # include routing
-            $this->loadRoutesFrom(__DIR__ . '/routes/web.php');
             $this->loadRoutesFrom(__DIR__ . '/routes/api.php');
         });
+
+        \Laravel\Passport\Client::observe(ClientObserver::class);
     }
 
     /**

@@ -10,6 +10,11 @@ into the more pleasing, beautiful and industry standard:
 
 While not touching any of the core Passport files. It basically uses 2 middlewares to encode and decode the `client_id` on routes.
 
+Encryption of the client secrets is option. These are saved in plain-text by default. After enabling this feature Hashed Passport turns a database entry of `wOVl4sBrTU46KwaiV56yc9IftikEIcKfWYCpwosG` 
+
+into
+ 
+`eyJpdiI6IkhDQlYyZDBpeUVCVHRsZGFcL3ZiejRBPT0iLCJ2YWx1ZSI6InFoUGRKcUFRaVwvc2t3Q1ZhVHhqM3lpaW05cm1FaXpObUtyNmd4QXNMU21mVmNhNW45N0lVTHJLa2prYlJpcmpnQzJqMTRXS1c3NWlaR2tcL01ZZmFNXC9RPT0iLCJtYWMiOiJhYzJmOTMwZWE2NTI4MWZiMTAxNDg5NTQ2NmFiNDU2YmZmOTcxOTIzMTVmNTU2Njk1N2ZlNzg5MzFiNmI5MTUzIn0=` 
 
 Introduction
 -----
@@ -21,6 +26,13 @@ The pros and cons are all listed in this 2 year old issue. You can tell just _ho
 [Original Laravel/Passport Github Thread](https://github.com/laravel/passport/issues/14)
 
 
+Requirements
+-----
+The migration changes the default VARCHAR(100) setting of the `secret` column of the `oauth_clients` table to VARCHAR(2048). Make sure your database supports this. If you use MySQL this means version 5.0.3+
+
+This length is needed to support the encrypted client secret value. It could be less, but I'd rather be safe than sorry. The actual maximum column character length has no impact on storage usage.
+
+
 Installation
 -----
 
@@ -28,23 +40,34 @@ Installation
 
 `composer require ssmulders/hashed-passport`
 
-No additional steps are needed.
 
-Usage
+**OPTIONAL:** To enable encryption of your client secrets you should add   `HashedPassport::enableEncrytion();` to the register method of your `AppServiceProvider`.
+
+Then run the install command:
+
+`php artisan hashed_passport:install`
+
+If successful you'll be greeted with a large lock, meaning all your client secrets are now stored safely with Laravel's `encrypt()` helper.
+
+Further Usage and Customisation
 -----
 
-All clients returned by the `/oauth/clients` route now contain the hashed id accessible by the `client_id` parameter.
+Anywhere you access the `Laravel\Passport\Client` model a `client_id` parameter is made available. This is the hashed client id. 
 
-When sending a request to a route with the `hashed_passport` middleware, the `client_id` key will automatically be decoded to it's integer value for further processing by the application.
+After installation `/oauth/token` route will now accept both the the hashed id and the regular integer id on incoming requests.
 
-You can easily add the middleware to other Passport routes by overwriting them by adding them to your `web.php` or `api.php` routes file and add the `hashed_passport` middleware like so:
+To add this functionality to any other route, just attach the `hashed_passport` middleware like so:
 
-`Route::get('/oauth/clients', '\Laravel\Passport\Http\Controllers\ClientController@update')->middleware(['web', 'auth', 'hashed_passport']);`
+`Route::get('/oauth/clients', '\Laravel\Passport\Http\Controllers\ClientController@update')->middleware(['hashed_passport']);`
+
+The incoming hashed `client_id` string will now automatically be converted to it's integer value before being processed further by application.
 
 How it works
 -----
 
-In order to work out-of-the-box the package overwrites the oAuth2 token and client routes to serve and accept the Client ID as a hashed string. It's still based on the `oauth_clients` table's `index` column. All it does is transform that ugly integer into a beautiful hashed string, Cinderella style.
+In order to work out-of-the-box the package overwrites the oAuth2 token route to accept the Client ID as a hashed string. Further more the hashed client id is made available on all Client models through the `client_id` parameter thanks to the `ClientObserver`. This same `ClientObserver` takes care of the encrypting and decrypting of the client secret (if enabled). 
+
+The hashed id is still based on the `oauth_clients` table's `index` column. All it does is transform that ugly integer into a beautiful hashed string, Cinderella style.
 
 It adds a new connection to Hashids called `client_id`. This salt is based on your `APP_KEY`. It should be unique to all projects, while constant enough to be usable as a salt.
 
@@ -59,13 +82,22 @@ Supported grant types:
 Troubleshooting
 -----
 
-* The package should be compatible with any installation and can even be used with projects that are using the integer client_id in production, as it will support both versions of the client_id.
+* The package should be compatible with any installation and can even be used with projects that are using the integer client_id in production, as it will support both versions of the client_id and encrypt the secrets of all clients.
 
-* Should support for hashed IDs be added in the future, all you'd need to do was update your package.
+* Check your routes to make sure that `/oauth/token` uses the `hashed_passport` middleware: 
+`php artisan route:list`. The same applies for any other routes you want to accept requests with hashed ids from.
 
-* Check your routes to make sure the token and client ones use the `hashed_passport` middleware: 
-`php artisan route:list`
 
+Uninstall
+-----
+
+Should support for hashed IDs be added to Passport in the future, all you'd need to do in order to revert back to normal is follow the uninstall instructions below.
+
+Run `php artisan hashed_passport:uninstall`  to revert back to plain text secrets in your database.
+
+Then run `composer remove ssmulders/hashed-passport` to remove the package.
+
+And if you enabled encryption, be sure to remove `HashedPassport::withEncryption();` from your `AppServiceProvider`
 
 Feedback
 ---
@@ -78,7 +110,7 @@ Learning how to create a package has opened up a whole new bag of appreciation f
 
 Credits
 ---
-Thanks to [@hfmikep](https://github.com/hfmikep) and [@nikkuang](https://github.com/nikkuang) for being the first to properly start tackling this long-standing feature request. And once again to [@hfmikep](https://github.com/hfmikep) for for creating the code that's used in the `UnHashClientIdOnRequest` middleware.
+Thanks to [@hfmikep](https://github.com/hfmikep) and [@nikkuang](https://github.com/nikkuang) for being the first to properly start tackling this long-standing feature request. And once again to [@hfmikep](https://github.com/hfmikep) for for creating the code that's used in the `UnHashClientIdOnRequest` middleware. And to [@corbosman](https://github.com/corbosman) for requesting the client secret encryption.
 
 License
 ---

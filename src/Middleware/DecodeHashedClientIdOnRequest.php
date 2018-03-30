@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Ssmulders\HashedPassport\Traits\HashesIds;
 
-class UnHashClientIdOnRequest
+class DecodeHashedClientIdOnRequest
 {
     use HashesIds;
 
