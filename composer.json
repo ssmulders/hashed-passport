@@ -1,6 +1,6 @@
 {
     "name": "ssmulders/hashed-passport",
-    "description": "Transforms Laravel Passport's default incrementing integer client_id into an industry standard unique hashed string. Optionally, you can use encrypted client secrets for improved security. The package is non-intrusive as it only changes the secret column from varchar(100) to varchar(1024) and retains support for the 'old' integer client_id.",
+    "description": "Transforms Laravel Passport's default incrementing integer client_id into an industry standard unique hashed string. Optionally, you can use encrypted client secrets for improved security. The package is non-intrusive. See the readme for details.",
     "type": "library",
     "require": {
         "laravel/passport": "^5.0",
