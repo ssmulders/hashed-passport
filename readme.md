@@ -10,7 +10,7 @@ into the more pleasing, beautiful and industry standard:
 
 While not touching any of the core Passport files. It basically uses 2 middlewares to encode and decode the `client_id` on routes.
 
-Encryption of the client secrets is option. These are saved in plain-text by default. After enabling this feature Hashed Passport turns a database entry of `wOVl4sBrTU46KwaiV56yc9IftikEIcKfWYCpwosG` 
+Encryption of the client secrets is optional. These are saved in plain-text by default. After enabling this feature Hashed Passport turns a database entry of `wOVl4sBrTU46KwaiV56yc9IftikEIcKfWYCpwosG` 
 
 into
  
