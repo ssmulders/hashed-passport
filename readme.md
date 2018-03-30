@@ -8,7 +8,7 @@ into the more pleasing, beautiful and industry standard:
 
 `client_id: AE20JvpmdYx34wD789Lng5jyqelQar8R`
 
-While not touching any of the core Passport files. It basically uses 2 middlewares to encode and decode the `client_id` on routes.
+While not touching any of the core Passport files. It uses a middleware decode the `client_id` on routes and an observer to make the hashed id available through the `client_id` parameter of the `\Laravel\Passport\Client` anywhere in the application.
 
 Encryption of the client secrets is optional. These are saved in plain-text by default. After enabling this feature Hashed Passport turns a database entry of `wOVl4sBrTU46KwaiV56yc9IftikEIcKfWYCpwosG` 
 
@@ -28,7 +28,9 @@ The pros and cons are all listed in this 2 year old issue. You can tell just _ho
 
 Requirements
 -----
-The migration changes the default VARCHAR(100) setting of the `secret` column of the `oauth_clients` table to VARCHAR(2048). Make sure your database supports this. If you use MySQL this means version 5.0.3+
+
+**OPTIONAL**
+The migration needed to support encryption changes the default VARCHAR(100) setting of the `secret` column of the `oauth_clients` table to VARCHAR(2048). Make sure your database supports this. If you use MySQL this means version 5.0.3+
 
 This length is needed to support the encrypted client secret value. It could be less, but I'd rather be safe than sorry. The actual maximum column character length has no impact on storage usage.
 
@@ -60,7 +62,7 @@ To add this functionality to any other route, just attach the `hashed_passport` 
 
 `Route::get('/oauth/clients', '\Laravel\Passport\Http\Controllers\ClientController@update')->middleware(['hashed_passport']);`
 
-The incoming hashed `client_id` string will now automatically be converted to it's integer value before being processed further by application.
+The incoming hashed `client_id` string will now automatically be converted to it's integer value before being processed further by the application.
 
 How it works
 -----
