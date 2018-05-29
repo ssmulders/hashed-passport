@@ -43,7 +43,7 @@ Installation
 `composer require ssmulders/hashed-passport`
 
 
-**OPTIONAL:** To enable encryption of your client secrets you should add   `HashedPassport::withEncrytion();` to the register method of your `AppServiceProvider`.
+**OPTIONAL:** To enable encryption of your client secrets you should add   `HashedPassport::withEncryption();` to the register method of your `AppServiceProvider`.
 
 Then run the install command:
 

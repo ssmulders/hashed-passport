@@ -6,10 +6,13 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Ssmulders\HashedPassport\HashedPassport;
 use Ssmulders\HashedPassport\Traits\HandlesEncryptedSecrets;
 
 class Install extends Command
 {
+    use HandlesEncryptedSecrets;
+
     /**
      * The name and signature of the console command.
      *
@@ -39,12 +42,18 @@ class Install extends Command
      */
     public function handle()
     {
-        /**
-         * Just calls the migration ;-)
-         */
-        Artisan::call('migrate');
+        if(HashedPassport::$withEncryption)
+        {
+            /**
+             * Just calls the migration ;-)
+             */
+            Artisan::call('migrate');
 
-        $this->info('Hashed-pass installation completed.');
+            $this->encrypt_client_secrets();
+            $this->secrets_encrypted();
+        }
+
+        $this->info('Hashed passport installation completed.');
     }
 
 
