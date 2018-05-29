@@ -23,7 +23,7 @@ class HashedPassportServiceProvider extends ServiceProvider
          * Add the Hashids salt with the APP_KEY so it's unique, but constant
          */
         $this->app['config']['hashids.connections.client_id'] = [
-            'salt'   => env('APP_KEY'),
+            'salt'   => env('APP_NAME'),
             'length' => '32',
         ];
 
