@@ -3,9 +3,7 @@
 namespace Ssmulders\HashedPassport\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Ssmulders\HashedPassport\HashedPassport;
 use Ssmulders\HashedPassport\Traits\HandlesEncryptedSecrets;
 
 class Uninstall extends Command
@@ -40,8 +38,11 @@ class Uninstall extends Command
      */
     public function handle()
     {
-        $this->decrypt_client_secrets();
-        $this->secrets_decrypted();
+        if (HashedPassport::$withEncryption)
+        {
+            $this->decrypt_client_secrets();
+            $this->secrets_decrypted();
+        }
     }
 
 
