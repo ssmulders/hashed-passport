@@ -27,8 +27,8 @@ The pros and cons are all listed in this 2 year old issue. You can tell just _ho
 
 Changelog
 ---
-* 1.0 - Non-intrusive implementation hashed Passport client IDs.
-* 1.1 - Non-intrusive implementation hashed Passport client secrets.
+* 1.0 - Non-intrusive implementation of hashed Passport client IDs.
+* 1.1 - Non-intrusive implementation of encrypted Passport client secrets.
 * 1.2 - Added the option to customise the hashing salt, cleaned up the code and improved the readme.
 
 Requirements
