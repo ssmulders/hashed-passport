@@ -19,50 +19,19 @@ class HashedPassportServiceProvider extends ServiceProvider
      */
     public function boot(Router $router)
     {
-        /**
-         * Add the Hashids salt with the APP_KEY so it's unique, but constant
-         */
-        $this->app['config']['hashids.connections.client_id'] = [
-            'salt'   => env('APP_NAME'),
-            'length' => '32',
-        ];
+        $this->set_salt();
 
-        /**
-         * The middleware magic
-         *
-         * Catches both incoming and outgoing requests and should be compatible with custom routes
-         */
-        $router->middlewareGroup('hashed_passport', [
-            \Ssmulders\HashedPassport\Middleware\DecodeHashedClientIdOnRequest::class,
-        ]);
+        $this->register_middleware($router);
 
-        /**
-         * Adds the encryption commands.
-         */
-        if ($this->app->runningInConsole())
-        {
-            /**
-             * Upgrades the secret column's max length from 100 to 2048 characters to support encrypted values.
-             */
-            if (HashedPassport::$withEncryption)
-            {
-                $this->loadMigrationsFrom(__DIR__ . '/migrations');
-            }
+        $this->register_console_commands_and_migrations();
 
-            $this->commands([
-                Install::class,
-                Uninstall::class,
-            ]);
-        }
+        $this->register_observer();
 
-        /**
-         * Overwrites the Passport routes after the app has loaded to ensure these are used.
-         */
-        $this->app->booted(function () {
-            $this->loadRoutesFrom(__DIR__ . '/routes/api.php');
-        });
+        $this->load_routes();
 
-        \Laravel\Passport\Client::observe(ClientObserver::class);
+        $this->publishes([
+            __DIR__ . '/config/hashed-passport.php' => config_path('hashed-passport.php')
+        ], 'config');
     }
 
     /**
@@ -72,6 +41,82 @@ class HashedPassportServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->mergeConfigFrom(
+            __DIR__ . '/config/hashed-passport.php', 'hashed-passport'
+        );
+    }
+
+    /*
+     |--------------------------------------------------------------------------
+     | Helpers
+     |--------------------------------------------------------------------------
+     |
+     | To keep things cleaner
+     |
+     |
+     */
+    /**
+     * Registers the observer that handles the hashed client_id
+     */
+    private function register_observer()
+    {
+        \Laravel\Passport\Client::observe(ClientObserver::class);
+    }
+
+    /**
+     * Overwrites the Passport routes after the app has loaded to ensure these are used.
+     */
+    private function load_routes()
+    {
+        $this->app->booted(function () {
+            $this->loadRoutesFrom(__DIR__ . '/routes/api.php');
+        });
+    }
+
+    /**
+     * Adds the encryption commands and migrations.
+     */
+    private function register_console_commands_and_migrations()
+    {
+        if ($this->app->runningInConsole())
+        {
+            /**
+             * Upgrades the secret column's max length from 100 to 2048 characters to support encrypted values.
+             * Enables the manual encrypting and decrypting of the client secrets
+             */
+            if (HashedPassport::$withEncryption)
+            {
+                $this->loadMigrationsFrom(__DIR__ . '/migrations');
+
+                $this->commands([
+                    Install::class,
+                    Uninstall::class,
+                ]);
+            }
+
+        }
+    }
+
+    /**
+     * Add the Hashids salt with the APP_KEY so it's unique, but constant
+     */
+    private function set_salt()
+    {
+        $this->app['config']['hashids.connections.hashed_passport'] = [
+            'salt'   => config('hashed-passport.salt'),
+            'length' => '32',
+        ];
+    }
+
+    /**
+     * The middleware magic
+     *
+     * Catches both incoming and outgoing requests and should be compatible with custom routes
+     */
+    private function register_middleware(Router $router)
+    {
+        $router->middlewareGroup('hashed_passport', [
+            \Ssmulders\HashedPassport\Middleware\DecodeHashedClientIdOnRequest::class,
+        ]);
     }
 }

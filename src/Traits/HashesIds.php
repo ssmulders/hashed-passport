@@ -8,19 +8,9 @@ use Hashids\Hashids;
  * Trait HashesIds
  * @package Ssmulders\HashedPassport
  *
- * Uses the APP_KEY to hash and unhash the Passport Client's ID
+ * Uses the configured salt to hash and unhash the Passport Client's ID
  */
 trait HashesIds {
-
-    /**
-     * @var Hashids $hashIds
-     */
-    protected $hashIds;
-
-    public function __construct()
-    {
-        $this->hashIds = new Hashids(env('APP_KEY'));
-    }
 
     /**
      * Hashes the regular incrementing integer id
@@ -30,7 +20,7 @@ trait HashesIds {
      */
     protected function encode($id)
     {
-        return \Hashids::connection('client_id')->encode($id);
+        return \Hashids::connection('hashed_passport')->encode($id);
     }
 
     /**
@@ -41,7 +31,7 @@ trait HashesIds {
      */
     protected function decode($client_id)
     {
-        return \Hashids::connection('client_id')->decode($client_id);
+        return \Hashids::connection('hashed_passport')->decode($client_id);
     }
 
 }

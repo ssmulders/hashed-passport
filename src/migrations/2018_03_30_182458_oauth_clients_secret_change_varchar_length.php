@@ -6,8 +6,6 @@ use Illuminate\Database\Migrations\Migration;
 
 class OauthClientsSecretChangeVarcharLength extends Migration
 {
-    use \Ssmulders\HashedPassport\Traits\HandlesEncryptedSecrets;
-
     /**
      * Run the migrations.
      *
@@ -21,9 +19,6 @@ class OauthClientsSecretChangeVarcharLength extends Migration
         Schema::table('oauth_clients', function (Blueprint $table) {
             $table->string('secret', 2048)->change();
         });
-
-        $this->encrypt_client_secrets();
-        $this->secrets_encrypted();
     }
 
     /**
@@ -33,9 +28,6 @@ class OauthClientsSecretChangeVarcharLength extends Migration
      */
     public function down()
     {
-        $this->decrypt_client_secrets();
-        $this->secrets_decrypted();
-
         /**
          * Change the value back to it's default value of 100
          */
