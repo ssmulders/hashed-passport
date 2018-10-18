@@ -3,7 +3,7 @@
     "description": "Transforms Laravel Passport's default incrementing integer client_id into an industry standard unique hashed string. Optionally, you can use encrypted client secrets for improved security. The package is non-intrusive. See the readme for details.",
     "type": "library",
     "require": {
-        "laravel/passport": "^5.0",
+        "laravel/passport": "^7.0",
         "vinkla/hashids": "^5.0",
         "doctrine/dbal": "^2.6"
     },
