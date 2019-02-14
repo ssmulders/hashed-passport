@@ -4,6 +4,7 @@ namespace Ssmulders\HashedPassport;
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Passport\Client;
 use Laravel\Passport\Passport;
 use Ssmulders\HashedPassport\Commands\Install;
 use Ssmulders\HashedPassport\Commands\Uninstall;
@@ -23,15 +24,17 @@ class HashedPassportServiceProvider extends ServiceProvider
 
         $this->register_middleware($router);
 
-        $this->register_console_commands_and_migrations();
-
         $this->register_observer();
 
         $this->load_routes();
 
-        $this->publishes([
-            __DIR__ . '/config/hashed-passport.php' => config_path('hashed-passport.php')
-        ], 'config');
+        if ($this->app->runningInConsole()) {
+            $this->register_console_commands_and_migrations();
+
+            $this->publishes([
+                __DIR__ . '/../config/hashed-passport.php' => config_path('hashed-passport.php'),
+            ], 'config');
+        }
     }
 
     /**
@@ -42,7 +45,7 @@ class HashedPassportServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/config/hashed-passport.php', 'hashed-passport'
+            __DIR__ . '/../config/hashed-passport.php', 'hashed-passport'
         );
     }
 
@@ -53,14 +56,14 @@ class HashedPassportServiceProvider extends ServiceProvider
      |
      | To keep things cleaner
      |
-     |
      */
+
     /**
      * Registers the observer that handles the hashed client_id
      */
     private function register_observer()
     {
-        \Laravel\Passport\Client::observe(ClientObserver::class);
+        Client::observe(ClientObserver::class);
     }
 
     /**
@@ -69,7 +72,7 @@ class HashedPassportServiceProvider extends ServiceProvider
     private function load_routes()
     {
         $this->app->booted(function () {
-            $this->loadRoutesFrom(__DIR__ . '/routes/api.php');
+            $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
         });
     }
 
@@ -78,22 +81,17 @@ class HashedPassportServiceProvider extends ServiceProvider
      */
     private function register_console_commands_and_migrations()
     {
-        if ($this->app->runningInConsole())
-        {
-            /**
-             * Upgrades the secret column's max length from 100 to 2048 characters to support encrypted values.
-             * Enables the manual encrypting and decrypting of the client secrets
-             */
-            if (HashedPassport::$withEncryption)
-            {
-                $this->loadMigrationsFrom(__DIR__ . '/migrations');
+        /**
+         * Upgrades the secret column's max length from 100 to 2048 characters to support encrypted values.
+         * Enables the manual encrypting and decrypting of the client secrets
+         */
+        if (Passport::$runsMigrations && HashedPassport::$withEncryption) {
+            $this->loadMigrationsFrom(__DIR__ . '/../migrations');
 
-                $this->commands([
-                    Install::class,
-                    Uninstall::class,
-                ]);
-            }
-
+            $this->commands([
+                Install::class,
+                Uninstall::class,
+            ]);
         }
     }
 
@@ -116,7 +114,7 @@ class HashedPassportServiceProvider extends ServiceProvider
     private function register_middleware(Router $router)
     {
         $router->middlewareGroup('hashed_passport', [
-            \Ssmulders\HashedPassport\Middleware\DecodeHashedClientIdOnRequest::class,
+            Middleware\DecodeHashedClientIdOnRequest::class,
         ]);
     }
 }
