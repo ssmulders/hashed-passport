@@ -9,6 +9,7 @@ use Ssmulders\HashedPassport\Traits\HandlesEncryptedSecrets;
 class Uninstall extends Command
 {
     use HandlesEncryptedSecrets;
+
     /**
      * The name and signature of the console command.
      *
@@ -21,7 +22,7 @@ class Uninstall extends Command
      *
      * @var string
      */
-    protected $description = 'Decrypts the client secrets outside of the migration flow, making it safe to remove hashed-passport.';
+    protected $description = 'Decrypts all the Laravel Passport client secrets.';
 
     /**
      * Create a new command instance.
@@ -43,7 +44,12 @@ class Uninstall extends Command
             $this->decrypt_client_secrets();
             $this->secrets_decrypted();
         }
+
+        $this->info('Hashed-passport removal completed.');
+        $this->info('');
+        $this->info('You can now safely run:');
+        $this->info('composer remove ssmulders/hashed-passport');
+        $this->info('');
+        $this->info('');
     }
-
-
 }

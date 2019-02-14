@@ -19,24 +19,19 @@ class HashedPassportServiceProvider extends ServiceProvider
      */
     public function boot(Router $router)
     {
-        /**
-         * Add the Hashids salt with the APP_KEY so it's unique, but constant
-         */
-        $this->app['config']['hashids.connections.client_id'] = [
-            'salt'   => config('hashed_passport.client_id_salt', env('APP_NAME')),
-            'length' => '32',
-        ];
+        $this->set_salt();
+
+        $this->register_middleware($router);
+
+        $this->register_console_commands_and_migrations();
+
+        $this->register_observer();
+
+        $this->load_routes();
 
         $this->publishes([
             __DIR__ . '/config/hashed-passport.php' => config_path('hashed-passport.php')
         ], 'config');
-
-        $this->load_middleware($router);
-        $this->load_routes();
-
-        $this->runs_in_console();
-
-        \Laravel\Passport\Client::observe(ClientObserver::class);
     }
 
     /**
@@ -46,39 +41,26 @@ class HashedPassportServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->mergeConfigFrom(
+            __DIR__ . '/config/hashed-passport.php', 'hashed-passport'
+        );
     }
-
 
     /*
      |--------------------------------------------------------------------------
      | Helpers
      |--------------------------------------------------------------------------
      |
-     | To keep things clean
+     | To keep things cleaner
      |
      |
      */
-    private function runs_in_console()
+    /**
+     * Registers the observer that handles the hashed client_id
+     */
+    private function register_observer()
     {
-        /**
-         * Adds the encryption commands.
-         */
-        if ($this->app->runningInConsole())
-        {
-            /**
-             * Upgrades the secret column's max length from 100 to 2048 characters to support encrypted values.
-             */
-            if (HashedPassport::$withEncryption)
-            {
-                $this->loadMigrationsFrom(__DIR__ . '/migrations');
-            }
-
-            $this->commands([
-                Install::class,
-                Uninstall::class,
-            ]);
-        }
+        \Laravel\Passport\Client::observe(ClientObserver::class);
     }
 
     /**
@@ -92,13 +74,46 @@ class HashedPassportServiceProvider extends ServiceProvider
     }
 
     /**
+     * Adds the encryption commands and migrations.
+     */
+    private function register_console_commands_and_migrations()
+    {
+        if ($this->app->runningInConsole())
+        {
+            /**
+             * Upgrades the secret column's max length from 100 to 2048 characters to support encrypted values.
+             * Enables the manual encrypting and decrypting of the client secrets
+             */
+            if (HashedPassport::$withEncryption)
+            {
+                $this->loadMigrationsFrom(__DIR__ . '/migrations');
+
+                $this->commands([
+                    Install::class,
+                    Uninstall::class,
+                ]);
+            }
+
+        }
+    }
+
+    /**
+     * Add the Hashids salt with the APP_KEY so it's unique, but constant
+     */
+    private function set_salt()
+    {
+        $this->app['config']['hashids.connections.hashed_passport'] = [
+            'salt'   => config('hashed-passport.salt'),
+            'length' => '32',
+        ];
+    }
+
+    /**
      * The middleware magic
      *
      * Catches both incoming and outgoing requests and should be compatible with custom routes
-     *
-     * @param Router $router
      */
-    private function load_middleware(Router $router)
+    private function register_middleware(Router $router)
     {
         $router->middlewareGroup('hashed_passport', [
             \Ssmulders\HashedPassport\Middleware\DecodeHashedClientIdOnRequest::class,

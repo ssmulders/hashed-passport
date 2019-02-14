@@ -4,16 +4,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Default Log Channel
+    | Hashed Passport Configuration
     |--------------------------------------------------------------------------
     |
-    | This option defines the default log channel that gets used when writing
-    | messages to the logs. The name specified in this option should match
-    | one of the channels defined in the "channels" configuration array.
+    | Edit these options to suit your application's needs
+    |
+    | You can remove any options you don't need in order to
+    | use the default settings
+    |
     |
     */
 
-    'client_id_salt' => '',
-
+    'salt' => env('APP_KEY'),
 
 ];
