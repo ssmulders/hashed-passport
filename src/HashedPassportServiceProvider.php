@@ -63,7 +63,8 @@ class HashedPassportServiceProvider extends ServiceProvider
      */
     private function register_observer()
     {
-        Client::observe(ClientObserver::class);
+        $client = Passport::clientModel();
+        $client::observe(ClientObserver::class);
     }
 
     /**
