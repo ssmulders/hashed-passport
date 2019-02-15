@@ -86,7 +86,7 @@ class HashedPassportServiceProvider extends ServiceProvider
          * Enables the manual encrypting and decrypting of the client secrets
          */
         if (Passport::$runsMigrations && HashedPassport::$withEncryption) {
-            $this->loadMigrationsFrom(__DIR__ . '/../migrations');
+            $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
             $this->commands([
                 Install::class,
