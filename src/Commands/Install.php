@@ -3,9 +3,6 @@
 namespace Ssmulders\HashedPassport\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Ssmulders\HashedPassport\HashedPassport;
 use Ssmulders\HashedPassport\Traits\HandlesEncryptedSecrets;
 
@@ -25,7 +22,7 @@ class Install extends Command
      *
      * @var string
      */
-    protected $description = 'Finishes the hashed-passport installation by encrypting all the client secrets.';
+    protected $description = 'Encrypts all the Laravel Passport client secrets.';
 
     /**
      * Create a new command instance.
@@ -42,19 +39,13 @@ class Install extends Command
      */
     public function handle()
     {
-        if(HashedPassport::$withEncryption)
-        {
-            /**
-             * Just calls the migration ;-)
-             */
-            Artisan::call('migrate');
-
+        if (HashedPassport::$withEncryption) {
             $this->encrypt_client_secrets();
             $this->secrets_encrypted();
         }
 
-        $this->info('Hashed passport installation completed.');
+        $this->info('Hashed Passport installation completed.');
+        $this->info('');
+        $this->info('');
     }
-
-
 }

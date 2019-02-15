@@ -6,8 +6,8 @@ use Laravel\Passport\Client;
 use Ssmulders\HashedPassport\HashedPassport;
 use Ssmulders\HashedPassport\Traits\HashesIds;
 
-class ClientObserver {
-
+class ClientObserver
+{
     use HashesIds;
 
     /**
@@ -15,14 +15,14 @@ class ClientObserver {
      * and decrypt the secret.
      *
      * @param  \Laravel\Passport\Client $oauth_client
+     *
      * @return void
      */
     public function retrieved(Client $oauth_client)
     {
         $oauth_client->setAttribute('client_id', $this->encode($oauth_client->getAttribute('id')));
 
-        if(HashedPassport::$withEncryption)
-        {
+        if (HashedPassport::$withEncryption) {
             $oauth_client->setAttribute('secret', decrypt($oauth_client->getAttribute('secret')));
         }
     }
@@ -34,9 +34,21 @@ class ClientObserver {
      */
     public function saving(Client $oauth_client)
     {
-        if (HashedPassport::$withEncryption)
-        {
+        // Prevent trying to save hashed client ID to the database.
+        $oauth_client->offsetUnset('client_id');
+
+        if (HashedPassport::$withEncryption) {
             $oauth_client->setAttribute('secret', encrypt($oauth_client->getAttribute('secret')));
         }
+    }
+
+    /**
+     * Hash the Client ID after saving it.
+     *
+     * @param Client $oauth_client
+     */
+    public function saved(Client $oauth_client)
+    {
+        $oauth_client->setAttribute('client_id', $this->encode($oauth_client->getAttribute('id')));
     }
 }

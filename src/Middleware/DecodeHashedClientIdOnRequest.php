@@ -3,7 +3,6 @@
 namespace Ssmulders\HashedPassport\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
 use Ssmulders\HashedPassport\Traits\HashesIds;
 
 class DecodeHashedClientIdOnRequest
@@ -11,26 +10,22 @@ class DecodeHashedClientIdOnRequest
     use HashesIds;
 
     /**
-     * @param $request Request
-     * @param Closure $next
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure                 $next
+     *
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
-        if ($request->offsetExists('client_id'))
-        {
+        if ($request->offsetExists('client_id')) {
             $client_id = $request->offsetGet('client_id');
 
-            if ( ! is_numeric($client_id))
-            {
+            if (!is_numeric($client_id)) {
                 $result = $this->decode($client_id);
 
-                if (count($result) > 0)
-                {
+                if (count($result) > 0) {
                     $request->offsetSet('client_id', $result[0]);
-                }
-                else
-                {
+                } else {
                     $request->offsetSet('client_id', -1);
                 }
             }

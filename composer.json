@@ -2,11 +2,6 @@
     "name": "ssmulders/hashed-passport",
     "description": "Transforms Laravel Passport's default incrementing integer client_id into an industry standard unique hashed string. Optionally, you can use encrypted client secrets for improved security. The package is non-intrusive. See the readme for details.",
     "type": "library",
-    "require": {
-        "laravel/passport": "^5.0",
-        "vinkla/hashids": "^5.0",
-        "doctrine/dbal": "^2.6"
-    },
     "license": "MIT",
     "support": {
         "issues": "https://github.com/ssmulders/hashed-passport/issues",
@@ -18,7 +13,26 @@
             "email": "stansmulders@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
+    "require": {
+        "laravel/passport": "^7.0",
+        "vinkla/hashids": "^5.0",
+        "doctrine/dbal": "^2.6"
+    },
+    "require-dev": {
+        "mockery/mockery": "~1.0",
+        "orchestra/testbench": "~3.7",
+        "phpunit/phpunit": "^7.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ssmulders\\HashedPassport\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ssmulders\\HashedPassport\\Tests\\": "tests/"
+        }
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "1.1-dev"
@@ -29,9 +43,9 @@
             ]
         }
     },
-    "autoload": {
-        "psr-4": {
-            "Ssmulders\\HashedPassport\\": "src/"
-        }
-    }
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
