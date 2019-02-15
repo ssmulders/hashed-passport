@@ -39,8 +39,7 @@ class Uninstall extends Command
      */
     public function handle()
     {
-        if (HashedPassport::$withEncryption)
-        {
+        if (HashedPassport::$withEncryption) {
             $this->decrypt_client_secrets();
             $this->secrets_decrypted();
         }

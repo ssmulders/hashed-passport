@@ -2,15 +2,14 @@
 
 namespace Ssmulders\HashedPassport;
 
-class HashedPassport {
-
+class HashedPassport
+{
     /**
      * Indicates if HashedPassport migrations will be run.
      *
      * @var bool
      */
-    public static $withEncryption = FALSE;
-
+    public static $withEncryption = false;
 
     /**
      * Configure HashedPassport to register its migrations and use encryption.
@@ -19,11 +18,10 @@ class HashedPassport {
      */
     public static function withEncryption()
     {
-        static::$withEncryption = TRUE;
+        static::$withEncryption = true;
 
         return new static;
     }
-
 
     /**
      * Configure HashedPassport to not register its migrations and not use encryption.
@@ -32,7 +30,7 @@ class HashedPassport {
      */
     public static function withoutEncryption()
     {
-        static::$withEncryption = FALSE;
+        static::$withEncryption = false;
 
         return new static;
     }
