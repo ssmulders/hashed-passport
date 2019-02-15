@@ -34,8 +34,21 @@ class ClientObserver
      */
     public function saving(Client $oauth_client)
     {
+        // Prevent trying to save hashed client ID to the database.
+        $oauth_client->offsetUnset('client_id');
+
         if (HashedPassport::$withEncryption) {
             $oauth_client->setAttribute('secret', encrypt($oauth_client->getAttribute('secret')));
         }
+    }
+
+    /**
+     * Hash the Client ID after saving it.
+     *
+     * @param Client $oauth_client
+     */
+    public function saved(Client $oauth_client)
+    {
+        $oauth_client->setAttribute('client_id', $this->encode($oauth_client->getAttribute('id')));
     }
 }
