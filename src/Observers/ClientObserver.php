@@ -20,6 +20,8 @@ class ClientObserver
      */
     public function retrieved(Client $oauth_client)
     {
+
+        $oauth_client->setAttribute('client_id', $this->encode($oauth_client->getAttribute('id')));
         $oauth_client->setAttribute('client_id', $this->encode($oauth_client->getAttribute('id')));
 
         if (HashedPassport::$withEncryption) {
@@ -43,12 +45,12 @@ class ClientObserver
     }
 
     /**
-     * Hash the Client ID after saving it.
+     * Hash the Client ID and encrypt secret after saving.
      *
      * @param Client $oauth_client
      */
     public function saved(Client $oauth_client)
     {
-        $oauth_client->setAttribute('client_id', $this->encode($oauth_client->getAttribute('id')));
+        $this->retrieved($oauth_client);
     }
 }
