@@ -3,6 +3,7 @@
 namespace Ssmulders\HashedPassport\Tests;
 
 use Illuminate\Encryption\Encrypter;
+use Illuminate\Support\Str;
 use Laravel\Passport\Passport;
 use Laravel\Passport\PassportServiceProvider;
 use Ssmulders\HashedPassport\HashedPassportServiceProvider;
@@ -10,7 +11,7 @@ use Vinkla\Hashids\HashidsServiceProvider;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -51,7 +52,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         return Passport::client()->create([
             'name'                   => 'Test Client',
-            'secret'                 => str_random(40),
+            'secret'                 => Str::random(40),
             'redirect'               => '',
             'personal_access_client' => false,
             'password_client'        => false,
