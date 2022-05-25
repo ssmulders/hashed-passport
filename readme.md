@@ -30,6 +30,7 @@ Changelog
 * 1.0 - Non-intrusive implementation of hashed Passport client IDs.
 * 1.1 - Non-intrusive implementation of encrypted Passport client secrets.
 * 1.2 - Added the option to customise the hashing salt, cleaned up the code and improved the readme.
+* 2.0 - Works with Laravel Passport 7.0 and includes tests. Major thanks to Hackel and other contributors.
 
 Requirements
 -----
