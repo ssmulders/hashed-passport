@@ -102,8 +102,8 @@ class HashedPassportServiceProvider extends ServiceProvider
     private function set_salt()
     {
         $this->app['config']['hashids.connections.hashed_passport'] = [
-            'salt'   => config('hashed-passport.salt'),
-            'length' => '32',
+            'salt'   => config('hashed-passport.salt', ''),
+            'length' => 32,
         ];
     }
 
