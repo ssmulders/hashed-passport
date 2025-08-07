@@ -86,7 +86,7 @@ class HashedPassportServiceProvider extends ServiceProvider
          * Upgrades the secret column's max length from 100 to 2048 characters to support encrypted values.
          * Enables the manual encrypting and decrypting of the client secrets
          */
-        if (Passport::$runsMigrations && HashedPassport::$withEncryption) {
+        if (HashedPassport::$withEncryption) {
             $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
             $this->commands([

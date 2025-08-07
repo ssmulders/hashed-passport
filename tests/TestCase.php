@@ -9,7 +9,9 @@ use Laravel\Passport\PassportServiceProvider;
 use Ssmulders\HashedPassport\HashedPassportServiceProvider;
 use Vinkla\Hashids\HashidsServiceProvider;
 
-abstract class TestCase extends \Orchestra\Testbench\TestCase
+use function Orchestra\Testbench\workbench_path;
+
+class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected function setUp(): void
     {
@@ -58,5 +60,11 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'password_client'        => false,
             'revoked'                => false,
         ])->fresh();
+    }
+
+    protected function defineDatabaseMigrations()
+    {
+        $this->loadMigrationsFrom(workbench_path('database/migrations'));
+        $this->loadMigrationsFrom(realpath(__DIR__ . '/../vendor/laravel/passport/database/migrations'));
     }
 }
